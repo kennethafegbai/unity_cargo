@@ -13,43 +13,43 @@ class NewPasswordController extends Controller
 {
 
     /**
-        * @OA\Post(
-        * path="/api/forgot-password",
-        * operationId="forgot-password",
-        * tags={"forgot-password"},
-        *security={ {"passport": {} }},
-        * summary="Reset forgotten password",
-        * description="Get a link to reset forgotten password",
-        *     @OA\RequestBody(
-        *         @OA\JsonContent(),
-        *         @OA\MediaType(
-        *            mediaType="application/form-data",
-        *            @OA\Schema(
-        *               type="object",
-        *               required={"email"},
-        *               @OA\Property(property="email", type="text"),     
-        *            ),
-        *        ),
-        *    ),
-        *      @OA\Response(
-        *          response=201,
-        *          description="reset password link sent to email",
-        *          @OA\JsonContent()
-        *       ),
-        *      @OA\Response(
-        *          response=200,
-        *          description="reset password link sent to email",
-        *          @OA\JsonContent()
-        *       ),
-        *      @OA\Response(
-        *          response=422,
-        *          description="Not processed",
-        *          @OA\JsonContent()
-        *       ),
-        *      @OA\Response(response=400, description="Bad request"),
-        *      @OA\Response(response=404, description="Resource Not Found"),
-        * )
-        */
+     * @OA\Post(
+     * path="/api/forgot-password",
+     * operationId="forgot-password",
+     * tags={"forgot-password"},
+     *security={ {"passport": {} }},
+     * summary="Reset forgotten password",
+     * description="Get a link to reset forgotten password",
+     *     @OA\RequestBody(
+     *         @OA\JsonContent(),
+     *         @OA\MediaType(
+     *            mediaType="application/form-data",
+     *            @OA\Schema(
+     *               type="object",
+     *               required={"email"},
+     *               @OA\Property(property="email", type="text"),     
+     *            ),
+     *        ),
+     *    ),
+     *      @OA\Response(
+     *          response=201,
+     *          description="reset password link sent to email",
+     *          @OA\JsonContent()
+     *       ),
+     *      @OA\Response(
+     *          response=200,
+     *          description="reset password link sent to email",
+     *          @OA\JsonContent()
+     *       ),
+     *      @OA\Response(
+     *          response=422,
+     *          description="Not processed",
+     *          @OA\JsonContent()
+     *       ),
+     *      @OA\Response(response=400, description="Bad request"),
+     *      @OA\Response(response=404, description="Resource Not Found"),
+     * )
+     */
     public function forgotPassword(Request $request)
     {
         $request->validate([
@@ -66,7 +66,8 @@ class NewPasswordController extends Controller
             // ];
 
             return response()->json([
-                'message'=> __($status),
+                'message' => __($status),
+                'status' => true,
             ], 201);
         }
 
@@ -74,55 +75,56 @@ class NewPasswordController extends Controller
         //     'email' => [trans($status)],
         // ]);
         return response()->json([
-            'message'=> "Email not found!!!",
+            'message' => "Email not found!!!",
+            'status' => false,
         ], 404);
     }
 
 
-      /**
-        * @OA\Post(
-        * path="/api/reset-password",
-        * operationId="reset-password",
-        * tags={"reset-password"},
-        *security={ {"passport": {} }},
-        * summary="Get a new password",
-        * description="Get a new password to replace forgotten one",
-        *     @OA\RequestBody(
-        *         @OA\JsonContent(),
-        *         @OA\MediaType(
-        *            mediaType="application/form-data",
-        *            @OA\Schema(
-        *               type="object",
-        *               required={"token"},
-        *               required={"email"},
-        *               required={"password"},
-        *               required={"password_confirmation"},
-        *               @OA\Property(property="token", type="text"),
-        *               @OA\Property(property="email", type="text"),  
-        *               @OA\Property(property="password", type="text"),   
-        *               @OA\Property(property="password_confirmation", type="text"),     
-        *            ),
-        *        ),
-        *    ),
-        *      @OA\Response(
-        *          response=201,
-        *          description="Password reset successfully",
-        *          @OA\JsonContent()
-        *       ),
-        *      @OA\Response(
-        *          response=200,
-        *          description="Password reset successfully",
-        *          @OA\JsonContent()
-        *       ),
-        *      @OA\Response(
-        *          response=422,
-        *          description="Not processed",
-        *          @OA\JsonContent()
-        *       ),
-        *      @OA\Response(response=400, description="Bad request"),
-        *      @OA\Response(response=404, description="Resource Not Found"),
-        * )
-        */
+    /**
+     * @OA\Post(
+     * path="/api/reset-password",
+     * operationId="reset-password",
+     * tags={"reset-password"},
+     *security={ {"passport": {} }},
+     * summary="Get a new password",
+     * description="Get a new password to replace forgotten one",
+     *     @OA\RequestBody(
+     *         @OA\JsonContent(),
+     *         @OA\MediaType(
+     *            mediaType="application/form-data",
+     *            @OA\Schema(
+     *               type="object",
+     *               required={"token"},
+     *               required={"email"},
+     *               required={"password"},
+     *               required={"password_confirmation"},
+     *               @OA\Property(property="token", type="text"),
+     *               @OA\Property(property="email", type="text"),  
+     *               @OA\Property(property="password", type="text"),   
+     *               @OA\Property(property="password_confirmation", type="text"),     
+     *            ),
+     *        ),
+     *    ),
+     *      @OA\Response(
+     *          response=201,
+     *          description="Password reset successfully",
+     *          @OA\JsonContent()
+     *       ),
+     *      @OA\Response(
+     *          response=200,
+     *          description="Password reset successfully",
+     *          @OA\JsonContent()
+     *       ),
+     *      @OA\Response(
+     *          response=422,
+     *          description="Not processed",
+     *          @OA\JsonContent()
+     *       ),
+     *      @OA\Response(response=400, description="Bad request"),
+     *      @OA\Response(response=404, description="Resource Not Found"),
+     * )
+     */
     public function reset(Request $request)
     {
         $request->validate([
@@ -152,18 +154,18 @@ class NewPasswordController extends Controller
             // ]);
 
             return response()->json([
-                'message'=> 'Password reset successfully'
+                'message' => 'Password reset successfully',
+                'status' => true
             ], 201);
         }
 
         // return response([
-        //     'message'=> __($status)
+        //     'message'=> __($status),
         // ], 500);
 
         return response()->json([
-            'message'=> "An error occured, try again",
+            'status' => false,
+            'message' => "An error occured, try again",
         ], 500);
-
-    } 
-
+    }
 }

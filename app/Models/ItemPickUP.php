@@ -10,6 +10,7 @@ class ItemPickUp extends Model
 {
     use HasFactory;
 
+<<<<<<< HEAD
     protected $fillable = [
         'first_name',
         'last_name',
@@ -37,4 +38,12 @@ class ItemPickUp extends Model
         'status'
     ];
 
+=======
+    protected $guarded = [];
+
+    public function History()
+    {
+        return $this->hasMany(ParcelHistory::class, "parcel_id", "id");
+    }
+>>>>>>> a2b680974174f969dabfe616c9894ad3329f2225
 }

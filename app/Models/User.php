@@ -19,12 +19,16 @@ class User extends Authenticatable implements MustVerifyEmail
      *
      * @var array
      */
+<<<<<<< HEAD
     protected $fillable = [
         'name',
         'email',
         'phone_number',
         'password',
     ];
+=======
+    protected $guarded = [];
+>>>>>>> a2b680974174f969dabfe616c9894ad3329f2225
 
     /**
      * The attributes that should be hidden for arrays.
@@ -48,11 +52,18 @@ class User extends Authenticatable implements MustVerifyEmail
 
     public function sendPasswordResetNotification($token)
     {
+<<<<<<< HEAD
         
+=======
+
+>>>>>>> a2b680974174f969dabfe616c9894ad3329f2225
         $url = 'https://localhost/reset-password?token=' . $token;
 
         $this->notify(new ResetPasswordNotification($url));
     }
+<<<<<<< HEAD
 
 
+=======
+>>>>>>> a2b680974174f969dabfe616c9894ad3329f2225
 }
