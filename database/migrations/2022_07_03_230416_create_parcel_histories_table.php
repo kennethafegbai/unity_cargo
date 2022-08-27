@@ -16,6 +16,7 @@ class CreateParcelHistoriesTable extends Migration
         Schema::create('parcel_histories', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger("parcel_id");
+            $table->string("tracking_id");
             $table->string("report");
 
             $table->foreign("parcel_id")->references("id")->on("item_pick_ups");

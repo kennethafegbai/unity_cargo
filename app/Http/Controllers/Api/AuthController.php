@@ -9,16 +9,78 @@ use Illuminate\Auth\Events\Registered;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+
 //use Validator;
 
 class AuthController extends Controller
 {
     public $successStatus = 200;
     /** 
-     * login api 
      * 
      * @return \Illuminate\Http\Response 
      */
+
+     // all staff
+
+      /**
+     * Display a listing of the resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    /**
+    * @OA\Get(
+    *      path="/api/users",
+    *      operationId="users",
+    *      tags={"users"},
+    *      security={
+    *      {"passport": {}},
+    *      },
+    *      summary="users",
+    *      description="Returns all users",
+    *      @OA\Response(
+    *          response=200,
+    *          description="Successful",
+    *          @OA\MediaType(
+    *           mediaType="application/json",
+    *      )
+    *      ),
+    *      @OA\Response(
+    *          response=401,
+    *          description="Unauthenticated",
+    *      ),
+    *      @OA\Response(
+    *          response=403,
+    *          description="Forbidden"
+    *      ),
+    * @OA\Response(
+    *      response=400,
+    *      description="Bad Request"
+    *   ),
+    * @OA\Response(
+    *      response=404,
+    *      description="not found"
+    *   ),
+    *  )
+    */
+
+   public function index()
+   {
+    $users = User::all();
+
+    if(count($users)==0){
+        return response()->json([
+            'success'=>false,
+            'message'=>'No record found',
+        ], 404);
+    }
+
+    return response()->json([
+       'success'=>true,
+       'message'=>'users',
+       'data'=>$users
+    ], $this->successStatus);
+
+   }
 
     // api doc for login
 
@@ -131,12 +193,13 @@ class AuthController extends Controller
      *            mediaType="application/form-data",
      *            @OA\Schema(
      *               type="object",
-     *               required={"name","email", "password", "c_password"},
-     *               @OA\Property(property="name", type="text"),
+     *               required={"firstname", "lastname", "email", "password", "phone_number", "role"},
+     *               @OA\Property(property="firstname", type="text"),
+     *               @OA\Property(property="lastname", type="text"),
      *               @OA\Property(property="email", type="text"),
      *               @OA\Property(property="phone_number", type="text"),
+     *               @OA\Property(property="role", type="string"),
      *               @OA\Property(property="password", type="password"),
-     *               @OA\Property(property="c_password", type="password")
      *            ),
      *        ),
      *    ),
@@ -166,14 +229,16 @@ class AuthController extends Controller
             'lastname' => 'required',
             'email' => 'required|email|unique:users',
             'phone_number' => 'required|unique:users',
-            'password' => 'required|min:6|max:20',
+            'password' => 'required|confirmed|min:6|max:20',
+            //'isStaff'=> 'required',
         ]);
         if ($validator->fails()) {
             return response()->json(['error' => $validator->errors()], 401);
         }
         $input = $request->all();
-        $input['password'] = bcrypt($input['password']);
-        $input['name'] = $request->firstname . " " . $request->lastname;
+        //$input['password'] = bcrypt($input['password']);
+        $input['password'] = Hash::make($request->password);
+       // $input['name'] = $request->firstname . " " . $request->lastname;
         $user = User::create($input);
         // event(new Registered($user));
         // $data['token'] =  $user->createToken('MyLaravelApp')->accessToken;
@@ -238,32 +303,186 @@ class AuthController extends Controller
         ], $this->successStatus);
     }
 
-    public function updateUser()
+/**
+    * @OA\Post(
+        * path="/api/update-user",
+        * operationId="update_user",
+        * tags={"update user"},
+        *security={ {"passport": {} }},
+        * summary="update user",
+        * description="update user",
+        *     @OA\RequestBody(
+        *         @OA\JsonContent(),
+        *         @OA\MediaType(
+        *            mediaType="application/x-www-form-urlencoded",
+        *            @OA\Schema(
+        *               type="object",
+        *               required={"firstname", "lastname", "phone", "address"},
+        *               @OA\Property(property="firstname", type="text"),  
+        *               @OA\Property(property="lastname", type="test"),      
+        *               @OA\Property(property="phone", type="text"),      
+        *               @OA\Property(property="address", type="text"),  
+        *                
+        *            ),
+        *        ),
+        *    ),      
+        *      @OA\Response(
+        *          response=201,
+        *          description="update Successful",
+        *          @OA\JsonContent()
+        *       ),
+        *      @OA\Response(
+        *          response=200,
+        *          description="update Successful",
+        *          @OA\JsonContent()
+        *       ),
+        *      @OA\Response(
+        *          response=422,
+        *          description="Not processed",
+        *          @OA\JsonContent()
+        *       ),
+        *      @OA\Response(response=400, description="Bad request"),
+        *      @OA\Response(response=404, description="Resource Not Found"),
+        *)
+        */
+
+    public function updateUser(Request $request)
     {
+        $validator = Validator::make($request->all(), [
+            'firstname'=>'required',
+            'lastname'=>'required',
+            'phone_number'=>'required',
+            'address'=>'required',
+        ]);
+
+        if ($validator->fails()) { 
+            return response()->json(['error'=>$validator->errors()], 401);            
+        }
+
         $user = User::where("id", Auth::user()->id)->first();
-
-        $user->firstname = request()->post('firstname');
-        $user->lastname = request()->post('lastname');
-        $user->phone_number = request()->post('phone');
-        $user->address = request()->post('address');
-
-        $user->save();
+        $user->firstname = $request->input('firstname');
+        $user->lastname = $request->input('lastname');
+        $user->phone_number = $request->input('phone_number');
+        $user->address = $request->input('address'); 
+        $user->update();
         return response()->json(true, 200);
     }
+
+
+
+    /**
+    * @OA\Post(
+        * path="/api/update-password",
+        * operationId="update_password",
+        * tags={"update password"},
+        *security={ {"passport": {} }},
+        * summary="update password",
+        * description="update password",
+        *     @OA\RequestBody(
+        *         @OA\JsonContent(),
+        *         @OA\MediaType(
+        *            mediaType="application/x-www-form-urlencoded",
+        *            @OA\Schema(
+        *               type="object",
+        *               required={"password", "old-password"},
+        *               @OA\Property(property="password", type="text"),  
+        *               @OA\Property(property="old_password", type="test"),       
+        *                
+        *            ),
+        *        ),
+        *    ),      
+        *      @OA\Response(
+        *          response=201,
+        *          description="update Successful",
+        *          @OA\JsonContent()
+        *       ),
+        *      @OA\Response(
+        *          response=200,
+        *          description="update Successful",
+        *          @OA\JsonContent()
+        *       ),
+        *      @OA\Response(
+        *          response=422,
+        *          description="Not processed",
+        *          @OA\JsonContent()
+        *       ),
+        *      @OA\Response(response=400, description="Bad request"),
+        *      @OA\Response(response=404, description="Resource Not Found"),
+        *)
+        */
+
     public function updatePassword(Request $request)
     {
         $this->validate($request, [
             "password" => "required|confirmed|min:8",
             "old_password" => "required",
         ]);
-        $user = User::where("id", Auth::user()->id)->first();
+
+        
+         $user = User::where("id", Auth::user()->id)->first();
 
         if (Hash::check($request->old_password, $user->password)) {
             $user->password = Hash::make($request->password);
             $user->save();
-            return response()->json(true, 200);
+            return response()->json([
+                'success'=>true,
+                'message'=>'password updated'
+            ], $this->successStatus);
         }
 
-        return response()->json(false, 200);
+        return response()->json(false, 401);
+    }
+
+    /**
+     * @OA\Delete(
+     * path="/api/user/{id}",
+     * operationId="delete-user",
+     * tags={"delete user"},
+     *security={ {"passport": {} }},
+     * summary="delete user",
+     * description="delete user",
+     *       @OA\Parameter(
+     *           description="ID of User",
+     *           in="path",
+     *           name="id",
+     *           required=true,
+     *           example="1",
+     *           @OA\Schema(
+     *               type="integer",
+     *               format="int64"
+     *            )
+     *   ),       
+     *      @OA\Response(
+     *          response=201,
+     *          description="delete Successful",
+     *          @OA\JsonContent()
+     *       ),
+     *      @OA\Response(
+     *          response=200,
+     *          description="delete Successful",
+     *          @OA\JsonContent()
+     *       ),
+     *      @OA\Response(
+     *          response=422,
+     *          description="Not processed",
+     *          @OA\JsonContent()
+     *       ),
+     *      @OA\Response(response=400, description="Bad request"),
+     *      @OA\Response(response=404, description="Resource Not Found"),
+     *      @OA\Response(response=401, description="Unauthenticated"),
+     *      @OA\Response(response=403, description="Forbidden"),
+     *)
+     */
+    public function destroy($id)
+    {
+        $user = User::find($id);
+        $user->delete();
+        return response()->json([
+            'success' => true,
+            'message' => 'Delete successful',
+            'data' => $user
+        ], $this->successStatus);
     }
 }
+
+

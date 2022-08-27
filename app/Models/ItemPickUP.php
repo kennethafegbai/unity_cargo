@@ -1,21 +1,19 @@
 <?php
 
 namespace App\Models;
-
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-
+use Illuminate\Notifications\Notifiable;
 
 class ItemPickUp extends Model
 {
-    use HasFactory;
+    use HasFactory, Notifiable;
 
-<<<<<<< HEAD
     protected $fillable = [
-        'first_name',
-        'last_name',
-        'phone_number',
-        'email',
+       // 'first_name',
+       // 'last_name',
+      //  'phone_number',
+      //  'email',
         'collection_address',
         'postal_code',
         'package_type',  
@@ -35,15 +33,14 @@ class ItemPickUp extends Model
         'delivery_type',
         'payment_type',
         'tracking_id',
-        'status'
+        'status',
+        'user_id'
     ];
 
-=======
     protected $guarded = [];
 
     public function History()
     {
         return $this->hasMany(ParcelHistory::class, "parcel_id", "id");
     }
->>>>>>> a2b680974174f969dabfe616c9894ad3329f2225
 }

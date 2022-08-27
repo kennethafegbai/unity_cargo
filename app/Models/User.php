@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Passport\HasApiTokens;
-use Illuminate\Support\Facades\Hash;
+//use Illuminate\Support\Facades\Hash;
 
 class User extends Authenticatable implements MustVerifyEmail
 {
@@ -19,16 +19,18 @@ class User extends Authenticatable implements MustVerifyEmail
      *
      * @var array
      */
-<<<<<<< HEAD
     protected $fillable = [
-        'name',
+        'firstname',
+        'lastname',
         'email',
+        'address',
         'phone_number',
         'password',
+       // 'isStaff',
+        'role'
     ];
-=======
-    protected $guarded = [];
->>>>>>> a2b680974174f969dabfe616c9894ad3329f2225
+
+    //protected $guarded = [];
 
     /**
      * The attributes that should be hidden for arrays.
@@ -52,18 +54,20 @@ class User extends Authenticatable implements MustVerifyEmail
 
     public function sendPasswordResetNotification($token)
     {
-<<<<<<< HEAD
         
-=======
 
->>>>>>> a2b680974174f969dabfe616c9894ad3329f2225
         $url = 'https://localhost/reset-password?token=' . $token;
 
         $this->notify(new ResetPasswordNotification($url));
     }
-<<<<<<< HEAD
 
 
-=======
->>>>>>> a2b680974174f969dabfe616c9894ad3329f2225
+    public function isRole(){
+
+        return $this->role;
+    }
+
+    // public function pickups(){
+    //     return $this->hasMany(ItemPickUp::class, 'user_id', 'id');
+    // }
 }

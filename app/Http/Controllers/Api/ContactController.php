@@ -58,6 +58,12 @@ class ContactController extends Controller
     public function index()
     {
         $contact = Contact::all();
+        if(count($contact)==0){
+            return response()->json([
+                'success'=>false,
+                'message'=>'No record found',
+            ], 404);
+        }
         return response()->json([
             'success'=>true,
             'message'=>'all contacts',

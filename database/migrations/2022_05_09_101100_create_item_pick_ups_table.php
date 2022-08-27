@@ -15,10 +15,10 @@ class CreateitempickupsTable extends Migration
     {
         Schema::create('item_pick_ups', function (Blueprint $table) {
             $table->id();
-            $table->string('first_name');
-            $table->string('last_name');
-            $table->string('phone_number');
-            $table->string('email');
+          //  $table->string('first_name');
+          // $table->string('last_name');
+          //  $table->string('phone_number');
+         //   $table->string('email');
             $table->string('collection_address');
             $table->string('postal_code');
             $table->string('package_type');

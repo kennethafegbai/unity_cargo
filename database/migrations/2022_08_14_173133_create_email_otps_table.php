@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class AddAddress extends Migration
+class CreateEmailOtpsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,8 +13,11 @@ class AddAddress extends Migration
      */
     public function up()
     {
-        Schema::table('users', function (Blueprint $table) {
-            $table->string("address")->nullable();
+        Schema::create('email_otps', function (Blueprint $table) {
+            $table->id();
+            $table->string('email');
+            $table->string('otp');
+            $table->timestamps();
         });
     }
 
@@ -25,8 +28,6 @@ class AddAddress extends Migration
      */
     public function down()
     {
-        Schema::table('users', function (Blueprint $table) {
-            //
-        });
+        Schema::dropIfExists('email_otps');
     }
 }

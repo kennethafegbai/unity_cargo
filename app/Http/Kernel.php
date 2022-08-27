@@ -43,6 +43,19 @@ class Kernel extends HttpKernel
             'throttle:api',
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
         ],
+
+        'adminPermission' => [
+            \App\Http\Middleware\adminPermission::class,
+        ],
+
+        'driverPermission' => [
+            \App\Http\Middleware\driverPermission::class,
+        ],
+
+        'staffPermission' => [
+            \App\Http\Middleware\driverPermission::class,
+        ],
+
     ];
 
     /**

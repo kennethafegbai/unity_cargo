@@ -3,6 +3,8 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Http;
+
 
 
 /*
@@ -20,5 +22,11 @@ Route::get('/', function () {
 });
 
 Route::get('/check', function(){
-echo Hash::make('3Dcaad52ac734103debb3cf377=d637c56e318ce4f7eb89635b54c87731647d8452');
+   //$user = Http::get('http://127.0.0.1:8000/api/user-details');
+   $request = Request::create('/api/users', 'get');
+  // $response = Route::dispatch($request);
+   $response = app()->handle($request);
+   $jsonBody = json_decode($response->getContent(), true);
+   $result = $jsonBody['data'];
+   return view('hello', compact('result'));
 });

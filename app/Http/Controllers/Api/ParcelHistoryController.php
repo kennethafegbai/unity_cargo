@@ -1,15 +1,12 @@
 <?php
 
 namespace App\Http\Controllers\Api;
-
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\models\Price;
+use App\Models\ParcelHistory;
 use Illuminate\Support\Facades\Validator; 
 
-//use Validator;
-
-class PriceController extends Controller
+class ParcelHistoryController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -17,17 +14,16 @@ class PriceController extends Controller
      * @return \Illuminate\Http\Response
      */
     public $successStatus = 200;
-
-    /**
+     /**
      * @OA\Get(
-     *      path="/api/price-lists",
-     *      operationId="all_prices",
-     *      tags={"All price"},
+     *      path="/api/parcel-history",
+     *      operationId="retrieve_parcel-history",
+     *      tags={"parcel-history"},
      *      security={
      *      {"passport": {}},
      *      },
-     *      summary="All price",
-     *      description="Returns all price",
+     *      summary="parcel-history",
+     *      description="Returns all parcel-history",
      *      @OA\Response(
      *          response=200,
      *          description="Successful",
@@ -56,18 +52,28 @@ class PriceController extends Controller
 
     public function index()
     {
-        $price = Price::all();
-        if(count($price)==0){
-            return response()->json([
-                'success'=>false,
-                'message'=>'No record found',
-            ], 404);
-        }
-            return response()->json([
-                'success'=>true, 
-                'message'=>'price lists', 
-                'data'=>$price
-            ], $this->successStatus);
+     $parcelhistory = ParcelHistory::all();
+     if(count($parcelhistory)==0){
+        return response()->json([
+            'success'=>false,
+            'message'=>'No record found',
+        ], 404);
+    }
+     return response()->json([
+        'succes'=>true,
+        'message'=>'Parcel histories',
+        'data'=>$parcelhistory
+     ], $this->successStatus);
+    }
+    
+    /**
+     * Show the form for creating a new resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function create()
+    {
+        //
     }
 
     /**
@@ -77,25 +83,24 @@ class PriceController extends Controller
      * @return \Illuminate\Http\Response
      */
 
-      /**
+    /**
         * @OA\Post(
-        * path="/api/price-lists",
-        * operationId="create_price",
-        * tags={"create price"},
+        * path="/api/parcel-history",
+        * operationId="add parcel history",
+        * tags={"parcel"},
         *security={ {"passport": {} }},
-        * summary="create price",
-        * description="create price",
+        * summary="submit contact form",
+        * description="add parcel history",
         *     @OA\RequestBody(
         *         @OA\JsonContent(),
         *         @OA\MediaType(
         *            mediaType="application/form-data",
         *            @OA\Schema(
         *               type="object",
-        *               required={"state", "door_rate", "collection_rate"},
-        *               @OA\Property(property="state", type="text"),  
-        *               @OA\Property(property="door_rate", type="text"),      
-        *               @OA\Property(property="collecion_rate", type="text"),      
-        *               @OA\Property(property="minimum_weight", type="text"),     
+        *               required={"parcel_id", "tracking_id", "report"},
+        *               @OA\Property(property="parcel_id", type="int"),
+        *               @OA\Property(property="tracking_id", type="text"),
+        *               @OA\Property(property="report", type="text"),                  
         *            ),
         *        ),
         *    ),
@@ -118,42 +123,51 @@ class PriceController extends Controller
         *      @OA\Response(response=404, description="Resource Not Found"),
         * )
         */
-    public function store(Request $request)
-    {
-        $validator = Validator::make($request->all(), [
-            'state'=>'required',
-            'door_rate'=>'required',
-            'collection_rate'=>'required',
-            'minimum_weight'=>'required',
-        ]);
-        if($validator->fails()){
-            return response()->json(['error'=>$validator->errors()], 401);
-        }
-        $input = $request->all();
-       $price = price::create($input);
-        return response()->json([
-            'success'=>true,
-            'message'=>'Create successful',
-            'data'=>$price,
-        ], $this->successStatus);
-    }
 
-   
-      /**
+        public function store(Request $request)
+        {
+            $validator = Validator::make($request->all(), [
+                'parcel_id' => 'required',
+                'tracking_id' => 'required',
+                'report' => 'required', 
+            ]);
+            if($validator->fails()){
+                return response()->json(['error'=>$validator->errors()], 401);
+            }
+    
+            $input = $request->all();
+            $parcelhistory = ParcelHistory::create($input);
+            return response()->json([
+                'success'=>true, 
+                'message'=>'Create successful',
+                'data'=>$parcelhistory
+            ], $this->successStatus);
+        }
+    
+
+    /**
+     * Display the specified resource.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+
+
+    /**
         * @OA\Get(
-        * path="/api/price-lists/{state}",
-        * operationId="price-lists",
-        * tags={"price_details"},
+        * path="/api/parcel-history/{tracking_id}",
+        * operationId="parcel-history-details",
+        * tags={"parcel_details"},
         *security={ {"passport": {} }},
-        * summary="price details",
-        * description="price details",  
+        * summary="parcel-history-details",
+        * description="parcel-history-details",  
         *       @OA\Parameter(
-        *           description="state price details",
+        *           description="parcel-history-details",
         *           in="path",
-        *           name="state",
+        *           name="tracking_id",
         *           required=true,
         *           @OA\Schema(
-        *               type="text",
+        *               type="integer",
         *            )
         *   ),       
         *      @OA\Response(
@@ -175,11 +189,10 @@ class PriceController extends Controller
         *      @OA\Response(response=404, description="Resource Not Found"),
         *)
         */
-
-    public function show($state)
+    public function show($tracking_id)
     {
-        $price = Price::where('state', $state)->first();
-        if (is_null($price)) {
+        $parcelhistory = ParcelHistory::where('tracking_id', $tracking_id)->get();
+        if(count($parcelhistory)==0){
             return response()->json([
                 'success'=>false,
                 'message'=>'No record found'
@@ -187,9 +200,20 @@ class PriceController extends Controller
         }
         return response()->json([
             'success' => true,
-            'message'=>'price details',
-            'data'=>$price
+            'message'=>'parcel history',
+            'data'=>$parcelhistory
         ], $this->successStatus);
+    }
+
+    /**
+     * Show the form for editing the specified resource.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function edit($id)
+    {
+        //
     }
 
     /**
@@ -198,26 +222,27 @@ class PriceController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @param  int  $id
      * @return \Illuminate\Http\Response
-     */  
- /**
+     */
+
+
+     /**
         * @OA\Put(
-        * path="/api/price-lists/{id}",
-        * operationId="update_price",
-        * tags={"update price"},
+        * path="/api/parcel-history/{id}",
+        * operationId="update-parcel-history",
+        * tags={"update parcel-history"},
         *security={ {"passport": {} }},
-        * summary="update price",
-        * description="update price",
+        * summary="update parcel-history",
+        * description="update parcel-history",
         *     @OA\RequestBody(
         *         @OA\JsonContent(),
         *         @OA\MediaType(
         *            mediaType="application/x-www-form-urlencoded",
         *            @OA\Schema(
         *               type="object",
-        *               required={"state", "door_rate", "collecion_rate", "minimum_weight"},
-        *               @OA\Property(property="state", type="text"),  
-        *               @OA\Property(property="door_rate", type="test"),      
-        *               @OA\Property(property="collection_ratte", type="text"),      
-        *               @OA\Property(property="minimum_weight", type="text"),  
+        *               required={"parcel_id", "tracking_id", "report"},
+        *               @OA\Property(property="parcel_id", type="int"),
+        *               @OA\Property(property="tracking_id", type="text"),
+        *               @OA\Property(property="report", type="text"),                 
         *                
         *            ),
         *        ),
@@ -256,24 +281,22 @@ class PriceController extends Controller
     public function update(Request $request, $id)
     {
         $validator = Validator::make($request->all(), [
-            'state'=>'required',
-            'door_rate'=>'required',
-            'collection_rate'=>'required',
-            'minimum_weight'=>'required',
+           // 'parcel_id' => 'required',
+           // 'tracking_id' => 'required',
+            'report' => 'required', 
         ]);
         if ($validator->fails()) { 
             return response()->json(['error'=>$validator->errors()], 401);            
         }
-           $price = Price::find($id);
-           $price->state = $request->input('state');
-           $price->door_rate = $request->input('door_rate');
-           $price->collection_rate = $request->input('collection_rate');
-           $price->minimum_weight = $request->input('minimum_weight');
-           $price->update();
+           $parcelhistory = ParcelHistory::find($id);
+           //$parcelhistory->parcel_id = $request->input('parcel_id');
+          // $parcelhistory->tracking_id = $request->input('tracking_id');
+           $parcelhistory->report = $request->input('report');
+           $parcelhistory->update();
             return response()->json([
                 'success' => true,
                 'message'=>'Update successful',
-                'data'=>$price
+                'data'=>$parcelhistory
             ], $this->successStatus); 
     }
 
@@ -284,16 +307,17 @@ class PriceController extends Controller
      * @return \Illuminate\Http\Response
      */
 
-    /**
+
+      /**
         * @OA\Delete(
-        * path="/api/price-lists/{id}",
-        * operationId="delete_price",
-        * tags={"delete price"},
+        * path="/api/parcel-history/{id}",
+        * operationId="delete-parcel-history",
+        * tags={"delete parcel-history"},
         *security={ {"passport": {} }},
-        * summary="delete price",
-        * description="delete price",
+        * summary="delete parcel-history",
+        * description="delete parcel-history",
         *       @OA\Parameter(
-        *           description="ID of price",
+        *           description="ID of parcel-history",
         *           in="path",
         *           name="id",
         *           required=true,
@@ -326,20 +350,12 @@ class PriceController extends Controller
         */
     public function destroy($id)
     {
-        $price = Price::find($id);
-        
-        if(is_null($price)){
-            return response()->json([
-                'success' => false,
-                'message'=>'No record found',
-            ], 404);
-        }
-
-        $price->delete();
+        $parcelhistory = ParcelHistory::find($id);
+        $parcelhistory->delete();
         return response()->json([
             'success' => true,
             'message'=>'Delete successful',
-            'data'=> $price
+            'data'=> $parcelhistory
         ], $this->successStatus);
     }
 }
